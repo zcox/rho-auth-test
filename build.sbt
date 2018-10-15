@@ -4,6 +4,7 @@ val http4sVersion = "0.18.19"
 val rhoVersion    = "0.18.0"
 
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")
+addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4")
 
 libraryDependencies ++= Seq(
   "org.http4s"        %% "http4s-dsl"          % http4sVersion,

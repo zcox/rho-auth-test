@@ -6,7 +6,7 @@ import cats.implicits._
 import cats.effect.{Effect, IO}
 import fs2.{Stream, StreamApp}
 import fs2.StreamApp.ExitCode
-import org.http4s.{Request, HttpService}
+import org.http4s.{Request, /*Response, Status,*/ HttpService}
 import org.http4s.server.AuthMiddleware
 import org.http4s.server.blaze.BlazeBuilder
 import org.http4s.rho.{RhoService, RhoMiddleware, AuthedContext}
@@ -22,10 +22,16 @@ object Service {
     "The hello endpoint" **
     GET / "hello" / pathVar[String]("name", "Name to say hello to.") >>> authedContext.auth |>> {
       (request: Request[F], name: String, user: User) =>
+        val ot = OptionT.some[F]("wtf")
         for {
-          _ <- Logger[F].info(s"Incoming request from $user: $request")
-          r <- Ok(s"Hello, $name.")
-        } yield r
+          x <- ot.value
+          _ <- Logger[F].info(s"$x Incoming request from $user for $name: $request")
+          // r <- NotFound(s"Could not find $name")
+          r <- x.fold(NotFound.pure(s"Could not find $name"))(_ => Ok.pure(s"Hello, $name."))
+          // r <- x.fold(NotFound(s"Could not find $name"))(_ => Ok(s"Hello, $name."))
+          // r <- x.map(_ => Ok(s"Hello, $name.")).getOrElse(NotFound("oops"))
+        // } yield x.fold(Response[F](Status.NotFound))(_ => Response[F](Status.Ok))
+      } yield r
     }
   }
 }
